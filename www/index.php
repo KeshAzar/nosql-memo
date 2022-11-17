@@ -25,7 +25,7 @@
 // Connexion à la base de données PostgreSQL
 
 $config = "pgsql:host=postgresql-memo;port=5432;dbname=postgres";
-$username = "user";
+$username = "admin";
 $password = "password";
 
 $db_connection = new PDO($config, $username, $password);

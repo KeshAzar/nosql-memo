@@ -15,7 +15,8 @@ services:
       - databases
 
   php:
-    build: .
+    build:
+      dockerfile: dockerfile_php
     container_name: php-memo
     volumes:
     - "./www:/script"
@@ -23,19 +24,23 @@ services:
       - databases
 
   postgresql-memo:
-    image: postgres:latest
+    build:
+      dockerfile: dockerfile_postgres
     restart: unless-stopped
     container_name: postgresql-memo
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
     ports:
     - published: 5432
       target: 5432
     volumes:
-    - postgres_data:/var/lib/postgresdata/data:rw
+      - "./pgsql-scripts:/docker-entrypoint-initdb.d"
+      - "postgres_data:/var/lib/postgresql/data"
     networks:
       - databases
+    # command: echo "fuck" &
+    # command: psql -U user -d postgres -f postgresqldata/data/datapostgres.sql
 
   redis-memo:
     image: redis:latest
@@ -45,7 +50,7 @@ services:
     - published: 6379
       target: 6379
     volumes:
-    - redis_data:/var/lib/redisdata/data:rw
+    - ./www/data/redis_data:/redisdata/data:rw
     networks:
       - databases
 
