@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   nginx:
     image: nginx:stable-alpine
     container_name: nginx
@@ -17,4 +16,32 @@ services:
     image: php:7.4-fpm-alpine
     container_name: php
     volumes:
-    - "./www:/script:ro"
+    - "./www:/script"
+
+  postgresql:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgresql
+    environment:
+      HOSTNAME: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+    - published: 5432
+      target: 5432
+    volumes:
+    - postgres_data:/var/lib/postgresdata/data:rw
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: redis
+    ports:
+    - published: 6379
+      target: 6379
+    volumes:
+    - redis_data:/var/lib/redisdata/data:rw
+  
+volumes:
+  postgres_data:
+  redis_data:
