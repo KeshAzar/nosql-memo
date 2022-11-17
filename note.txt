@@ -1,0 +1,28 @@
+
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgres
+    environment:
+      HOSTNAME: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+    - published: 5432
+      target: 5432
+    volumes:
+    - postgres_data:/var/lib/postgresdata/data:rw
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: redis
+    ports:
+    - published: 6379
+      target: 6379
+    volumes:
+    - redis_data:/var/lib/redisdata/data:rw
+  
+volumes:
+  postgres_data:
+  redis_data:
