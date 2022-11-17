@@ -231,8 +231,10 @@ $tachesArrayDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <li class="<?= ($infoTache["accomplie"] === true)?"accomplie":""; ?>">
                     <span class="coche done"><a href="?action=basculer&id=<?= $infoTache["id"]; ?>" title="Cliquez pour faire basculer l'état de cette tâche."><img src="ressources/images/coche.svg" alt=""></a></span>
-                    <span class="texte"><?= $infoTache["texte"]; ?></span>
-                    <span class="ajout"><?= $infoTache["date_ajout"]; ?></span>
+		    <div class="memo">    
+			<span class="texte"><?= $infoTache["texte"]; ?></span>
+			<span class="ajout"><?= $infoTache["date_ajout"]; ?></span>
+		    </div>
                     <span class="coche"><a href="?action=supprimer&id=<?= $infoTache["id"]; ?>" title="Cliquez pour supprimer cette tâche."><img src="ressources/images/delete.svg" alt=""></a></span>
                 </li>
 
