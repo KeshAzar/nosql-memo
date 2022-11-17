@@ -1,9 +1,9 @@
-version: '3.8'
+version: '3.9'
 
 services:
   nginx:
     image: nginx:stable-alpine
-    container_name: nginx
+    container_name: nginx-memo
     volumes:
     - "./www:/usr/share/nginx/html:ro"
     - "./log:/var/log/nginx"
@@ -11,19 +11,22 @@ services:
     ports:
     - published: 80
       target: 80
+    networks:
+      - databases
 
   php:
-    image: php:7.4-fpm-alpine
-    container_name: php
+    build: .
+    container_name: php-memo
     volumes:
     - "./www:/script"
+    networks:
+      - databases
 
-  postgresql:
+  postgresql-memo:
     image: postgres:latest
     restart: unless-stopped
-    container_name: postgresql
+    container_name: postgresql-memo
     environment:
-      HOSTNAME: postgres
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
@@ -31,17 +34,35 @@ services:
       target: 5432
     volumes:
     - postgres_data:/var/lib/postgresdata/data:rw
+    networks:
+      - databases
 
-  redis:
+  redis-memo:
     image: redis:latest
     restart: unless-stopped
-    container_name: redis
+    container_name: redis-memo
     ports:
     - published: 6379
       target: 6379
     volumes:
     - redis_data:/var/lib/redisdata/data:rw
+    networks:
+      - databases
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    container_name: adminer-memo
+    ports:
+    - published: 8080
+      target: 8080
+    networks:
+      - databases
   
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  databases:
+    driver: bridge

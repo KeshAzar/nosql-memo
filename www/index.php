@@ -8,12 +8,33 @@
 </script>
 
 <?php
+	function debug_to_console($data) {
+    $output = $data;
+    if (is_array($output))
+        $output = implode(',', $output);
+
+    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+	}
 
 /*************************************************
  * 
  *   0) Récupérer les tâches du fichier de données
  * 
  * **********************************************/
+
+// Connexion à la base de données PostgreSQL
+
+$config = "pgsql:host=postgresql-memo;port=5432;dbname=postgres";
+$username = "user";
+$password = "password";
+
+$db_connection = new PDO($config, $username, $password);
+
+// Connexion à la base de données Redis
+
+$redis = new Redis();
+$redis->connect('redis-memo', 6379);
+
 
 $tachesFichier = "data/memo.json";
 $tachesJSON = file_get_contents($tachesFichier);
@@ -22,8 +43,11 @@ $tachesJSON = file_get_contents($tachesFichier);
 $tachesArray = json_decode($tachesJSON, true);
 $tachesFilter = $tachesArray;
 
+$sql = "SELECT * FROM taches";
+$stmt = $db_connection->prepare($sql);
+$stmt->execute();
+$tachesArrayDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
- 
 
 /***********************
  *
@@ -39,27 +63,37 @@ if (isset($_POST["texteTache"])) {
     
     $idTache = uniqid();
     
+    
+    $dateHeureTache = gmdate('Y-m-d H:i:s');
+       
 
-    
-    $dateHeureTache = gmdate('Y-m-d\TH:i:s.v\Z');
-   
-
-    
-    
     $tachesArray[$idTache] = [
         "texte" => $texte,
         "accomplie" => false,
         "dateAjout" => $dateHeureTache,
     ];
 
-    
-
-    
+      
     $tachesJSON = json_encode($tachesArray);
 
-    
     file_put_contents($tachesFichier, $tachesJSON);
-}
+
+		// Insert dans postgresql
+
+		$sql = "INSERT INTO taches (id, texte, accomplie, date_ajout) VALUES (:id, :texte, :accomplie, :date_ajout)";
+		$stmt = $db_connection->prepare($sql);
+		$stmt->execute([
+			':id' => $idTache,
+			':texte' => $texte,
+			':accomplie' => 0,
+			':date_ajout' => $dateHeureTache,
+		]);
+
+
+		// Insert dans redis
+
+
+	}
 
 
 /*************************************************************
@@ -81,18 +115,13 @@ if (isset($_POST["texteTache"])) {
 if (isset($_GET["action"]) && $_GET["action"] == "filtrer") {
     
     
-    
-    
-    
-
-    
     if(isset($_GET["accomplie"]) && $_GET["accomplie"]==="1"){
-       $tachesArray=array_filter($tachesArray,function($p){
+       $tachesArrayDb=array_filter($tachesArrayDb,function($p){
            return ($p["accomplie"] == true);
        });
     }
     if(isset($_GET["accomplie"]) && $_GET["accomplie"]==="0"){
-        $tachesArray=array_filter($tachesArray,function($p){
+        $tachesArrayDb=array_filter($tachesArrayDb,function($p){
             return ($p["accomplie"] == false);
         });
      }
@@ -108,11 +137,28 @@ if (isset($_GET["action"]) && $_GET["action"] == "filtrer") {
 if (isset($_GET["action"]) && $_GET["action"]=="basculer" && isset($_GET["id"])) {
     
     $tachesArray[$_GET["id"]]["accomplie"] = !$tachesArray[$_GET["id"]]["accomplie"];
-    
+
+		$sql = "SELECT * FROM taches WHERE id = :id";
+		$stmt = $db_connection->prepare($sql);
+		$stmt->execute([
+			':id' => $_GET["id"],
+		]);
+		$tache = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		// Basculer dans postgresql
+
+		$sql = "UPDATE taches SET accomplie = :accomplie WHERE id = :id";
+		$stmt = $db_connection->prepare($sql);
+		$stmt->execute([
+			':accomplie' => $tache["accomplie"] ? 0 : 1,
+			':id' => $_GET["id"],
+		]);
+
+		// Basculer dans redis
+
     
     $tachesJSON = json_encode($tachesArray);
 
-    
     file_put_contents($tachesFichier, $tachesJSON);
 }
 
@@ -120,12 +166,28 @@ if (isset($_GET["action"]) && $_GET["action"]=="supprimer" && isset($_GET["id"])
     
     unset($tachesArray[$_GET["id"]]);
     
+		// Supprimer dans la db postgresql
+
+		$sql = "DELETE FROM taches WHERE id = :id";
+		$stmt = $db_connection->prepare($sql);
+		$stmt->execute([
+			':id' => $_GET["id"],
+		]);
+
+		// Supprimer dans redis
+
     
+  
     $tachesJSON = json_encode($tachesArray);
 
     
     file_put_contents($tachesFichier, $tachesJSON);
 }
+
+$sql = "SELECT * FROM taches";
+$stmt = $db_connection->prepare($sql);
+$stmt->execute();
+$tachesArrayDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -163,15 +225,15 @@ if (isset($_GET["action"]) && $_GET["action"]=="supprimer" && isset($_GET["id"])
             -->
 
             <?php
-            foreach ($tachesArray as $idTache => $infoTache) :
+            foreach ($tachesArrayDb as $infoTache) :
 
                 ?>
 
                 <li class="<?= ($infoTache["accomplie"] === true)?"accomplie":""; ?>">
-                    <span class="coche done"><a href="?action=basculer&id=<?= $idTache; ?>" title="Cliquez pour faire basculer l'état de cette tâche."><img src="ressources/images/coche.svg" alt=""></a></span>
+                    <span class="coche done"><a href="?action=basculer&id=<?= $infoTache["id"]; ?>" title="Cliquez pour faire basculer l'état de cette tâche."><img src="ressources/images/coche.svg" alt=""></a></span>
                     <span class="texte"><?= $infoTache["texte"]; ?></span>
-                    <span class="ajout"><?= $infoTache["dateAjout"]; ?></span>
-                    <span class="coche"><a href="?action=supprimer&id=<?= $idTache; ?>" title="Cliquez pour supprimer cette tâche."><img src="ressources/images/delete.svg" alt=""></a></span>
+                    <span class="ajout"><?= $infoTache["date_ajout"]; ?></span>
+                    <span class="coche"><a href="?action=supprimer&id=<?= $infoTache["id"]; ?>" title="Cliquez pour supprimer cette tâche."><img src="ressources/images/delete.svg" alt=""></a></span>
                 </li>
 
 
