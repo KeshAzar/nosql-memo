@@ -10,8 +10,11 @@ body {
     font-family: Verdana;
     font-size: 36px;
     color: #444;
-    background-color: #d5d5d5;
+    background-color: #83A7B6;
     padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 a, a:visited, a:link, a:hover {
@@ -20,7 +23,7 @@ a, a:visited, a:link, a:hover {
 }
 
 .conteneur {
-    width: 100%;
+    width: 80%;
     height: 100%;
 }
 
@@ -28,11 +31,12 @@ h1 {
     margin: 0;
     margin-bottom: 30px;
     text-align: center;
-    opacity: 0.6;
+    opacity: 0.8;
+    color: #1C414F;
 }
 
 h1:hover {
-    opacity: 0.9;
+    opacity: 1.2;
 }
 
 input.quoi-faire {
@@ -40,9 +44,11 @@ input.quoi-faire {
     padding: 15px;
     font-size: 36px;
     padding-left: 50px;
-    box-shadow: 10px 10px 15px 1px #ababab;
+    box-shadow: 10px 10px 15px 1px #1C414F;
+    background-color: #FFFBF6;
     border: none;
     margin: 20px 0;
+    border-radius: 5px;
 }
 
 div.filtres {
@@ -71,7 +77,6 @@ ul.liste-taches {
     margin-top: 10px;
     list-style: none;
     padding: 0;
-    background-color: white;
     width: 99%;
 }
 
@@ -80,6 +85,18 @@ ul.liste-taches li {
     border-bottom: 5px solid #d5d5d5;
     padding: 40px;
     position: relative;
+    border-radius: 5px;
+    background-color: #FFFBF6;
+    display: flex;
+}
+
+.memo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+    height: 100%;
+    margin-top: 10px;
 }
 
 ul.liste-taches li:hover {
@@ -96,19 +113,21 @@ ul.liste-taches li.accomplie {
     opacity: 0.5;
 }
 
+ul.liste-taches li.accomplie:hover {
+    text-decoration: line-through;
+    opacity: 0.75;
+}
+
 ul.liste-taches li span.ajout {
     font-size: 0.5em;
     font-family: Georgia;
     font-style: italic;
     opacity: 0.5;
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
 }
 .coche {
     position: absolute;
-    top: 10%;
-    right: 2%;
+    top: 25%;
+    right: 3%;
 }
 
 .done {
@@ -116,3 +135,4 @@ ul.liste-taches li span.ajout {
     left: 0%;
     top: 10%;
 }
+

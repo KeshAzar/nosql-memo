@@ -41,7 +41,7 @@ if (isset($_POST["texteTache"])) {
     
 
     
-    $dateHeureTache = gmdate('Y-m-d\TH:i:s.v\Z');
+    $dateHeureTache = gmdate('Y-m-d H:i:s');
    
 
     
@@ -169,8 +169,10 @@ if (isset($_GET["action"]) && $_GET["action"]=="supprimer" && isset($_GET["id"])
 
                 <li class="<?= ($infoTache["accomplie"] === true)?"accomplie":""; ?>">
                     <span class="coche done"><a href="?action=basculer&id=<?= $idTache; ?>" title="Cliquez pour faire basculer l'état de cette tâche."><img src="ressources/images/coche.svg" alt=""></a></span>
-                    <span class="texte"><?= $infoTache["texte"]; ?></span>
-                    <span class="ajout"><?= $infoTache["dateAjout"]; ?></span>
+                    <div class="memo">
+                        <span class="texte"><?= $infoTache["texte"]; ?></span>
+                        <span class="ajout"><?= $infoTache["dateAjout"]; ?></span>
+                    </div>
                     <span class="coche"><a href="?action=supprimer&id=<?= $idTache; ?>" title="Cliquez pour supprimer cette tâche."><img src="ressources/images/delete.svg" alt=""></a></span>
                 </li>
 
