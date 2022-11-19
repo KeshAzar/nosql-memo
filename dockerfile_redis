@@ -1,0 +1,4 @@
+FROM redis:latest
+
+COPY ./redis_rdb/dump.rdb /data/dump.rdb
+COPY ./redis_rdb/test /data/test

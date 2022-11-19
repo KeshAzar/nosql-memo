@@ -35,6 +35,9 @@ $db_connection = new PDO($config, $username, $password);
 $redis = new Redis();
 $redis->connect('redis-memo', 6379);
 
+$redisDbIdTaches = 0;
+$redisDbIdChat = 1;
+
 
 $tachesFichier = "data/memo.json";
 $tachesJSON = file_get_contents($tachesFichier);
@@ -91,7 +94,8 @@ if (isset($_POST["texteTache"])) {
 
 
 		// Insert dans redis
-
+		$redis->select($redisDbIdTaches);
+		$redis->rpush($idTache, $texte, 0, $dateHeureTache);
 
 	}
 
@@ -155,8 +159,10 @@ if (isset($_GET["action"]) && $_GET["action"]=="basculer" && isset($_GET["id"]))
 		]);
 
 		// Basculer dans redis
-
+		$redis->select($redisDbIdTaches);	
+		$redis->lset($_GET["id"], 1, $tache["accomplie"] ? 0 : 1);
     
+
     $tachesJSON = json_encode($tachesArray);
 
     file_put_contents($tachesFichier, $tachesJSON);
@@ -176,7 +182,8 @@ if (isset($_GET["action"]) && $_GET["action"]=="supprimer" && isset($_GET["id"])
 
 		// Supprimer dans redis
 
-    
+    $redis->select($redisDbIdTaches);
+		$redis->del($_GET["id"]);
   
     $tachesJSON = json_encode($tachesArray);
 
@@ -184,7 +191,7 @@ if (isset($_GET["action"]) && $_GET["action"]=="supprimer" && isset($_GET["id"])
     file_put_contents($tachesFichier, $tachesJSON);
 }
 
-$sql = "SELECT * FROM taches";
+$sql = "SELECT * FROM taches ORDER BY accomplie ASC, date_ajout DESC";
 $stmt = $db_connection->prepare($sql);
 $stmt->execute();
 $tachesArrayDb = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,0 +1,5 @@
+select 0
+
+LPUSH 6376542bcaa53 "finir le projet de nosql" "0" "2022-11-17 15:32:59"
+LPUSH 6376543653b77 "finir la présentation en anglais" "0" "2022-11-17 15:33:10"
+LPUSH 6376543154534 "apprécier la puissance de docker" "0" "2022-11-17 15:33:05"
