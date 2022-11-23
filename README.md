@@ -13,12 +13,37 @@ Je doit pourvoir **git clone**, jouer **docker compose up** pour interagir avec 
 La date limite de publication du projet sur github est le 23 novembre.
 
 ### Membres du groupe
-DEJEAN Dorian
-HESSINI Yanis
+- DEJEAN Dorian
+- HESSINI Yanis
 
 ### Choix des technologies
-Web : Serveur Nginx avec développement sous PHP
-Système de DB : Postgresql et Redis
+- Web : Serveur Nginx avec développement sous PHP
+- Système de DB : Postgresql et Redis
 
 ### Application développée
 Système de mémos partagés (pas de compte utilisateur)
+
+## Commandes
+
+### Build docker
+```bash
+docker-compose up -d --build
+```
+### Connexion aux db
+#### Postgres
+```bash
+docker exec -it postgresql-memo bash
+psql -U admin
+```
+#### Redis
+```bash
+docker exec -it redis-memo redis-cli
+```
+
+### Structure du projet
+
+Le projet contient 4 containers docker :
+- nginx-memo : Permet la gestion du serveur
+- php-memo : Gère la partie php sur serveur
+- postgresql-memo : Gère la BD Postgres
+- redis-memo : Gère la BD Redis
