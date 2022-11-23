@@ -42,8 +42,9 @@ docker exec -it redis-memo redis-cli
 
 ### Structure du projet
 
-Le projet contient 4 containers docker :
+Le projet contient 5 containers docker :
 - nginx-memo : Permet la gestion du serveur
 - php-memo : Gère la partie php sur serveur
 - postgresql-memo : Gère la BD Postgres
 - redis-memo : Gère la BD Redis
+- adminer-memo : Permet de gérer Postgres via une interface WEB
