@@ -107,30 +107,6 @@ if (isset($_POST["texteTache"])) {
  * **********************************************************/
 
 
-/************************
- * 
- *  3) Filtrer les tâches
- * 
- * *********************/
-
-
-
-
-if (isset($_GET["action"]) && $_GET["action"] == "filtrer") {
-    
-    
-    if(isset($_GET["accomplie"]) && $_GET["accomplie"]==="1"){
-       $tachesArrayDb=array_filter($tachesArrayDb,function($p){
-           return ($p["accomplie"] == true);
-       });
-    }
-    if(isset($_GET["accomplie"]) && $_GET["accomplie"]==="0"){
-        $tachesArrayDb=array_filter($tachesArrayDb,function($p){
-            return ($p["accomplie"] == false);
-        });
-     }
-}
-
 /*********************************
  *  
  *  4) Basculer l'état d'une tâche
@@ -222,6 +198,28 @@ $tachesArrayDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="index.php?action=filtrer&accomplie=0">Non-complétées</a>
             <a href="index.php">Toutes</a>
         </div>
+	<?php
+        /************************
+         * 
+         *  3) Filtrer les tâches
+         * 
+         * *********************/
+
+        if (isset($_GET["action"]) && $_GET["action"] == "filtrer") {
+
+
+            if (isset($_GET["accomplie"]) && $_GET["accomplie"] === "1") {
+                $tachesArrayDb = array_filter($tachesArrayDb, function ($p) {
+                    return ($p["accomplie"] == true);
+                });
+            }
+            if (isset($_GET["accomplie"]) && $_GET["accomplie"] === "0") {
+                $tachesArrayDb = array_filter($tachesArrayDb, function ($p) {
+                    return ($p["accomplie"] == false);
+                });
+            }
+        }
+        ?>
         <ul class="liste-taches">
             <!-- 
             Utilisez les éléments LI suivants comme gabarits pour l'affichage
